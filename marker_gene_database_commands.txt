@@ -1,0 +1,30 @@
+The tree inference and generating marker gene databases 
+
+- Input data type: 458 fasta files storing proteins for each gene stored in a directory. 
+
+#Run OrthoFinder: 
+
+orthofinder -f input_directory -t 12  -n “job name” -og 
+
+#Identify orthogroups containing desired genes.  
+#   Process input sequences into alignment using mafft. 
+
+mafft --auto --threads 8 input_genes.fasta > output_alignment.aln   
+
+#Construct supermatrix (concatenate 22 genes’ alignments into one) 
+
+phykit create_concatenation_matrix --alignment alignment_list.tsv --prefix A2K.phylo 
+
+#One of the output: A2K.phylo.fa will be the concatenated alignment of 22 genes and will be the input of iqtree2.  
+
+#Maximum Likelihood Tree Inference. 
+
+iqtree -s A2K.phylo.fa -bb 1000 -m TEST -nt 8 -redo -pre A2K” 
+
+#The lineage-specific marker set calculation for each internal node: 
+
+python construct_marker_set.py --input-tree "/data/backup_for_manuscript1_IMPORTANT/A2K.tax_mod.rerooted.reannotated.treefile" --node-wise True --output-tree marker_sets_verify.tree --species-genome-dict /home/student.unimelb.edu.au/yuhtong/andy/data/backup_for_manuscript1_IMPORTANT/species_genome_effective_dict.pkl 
+
+#The colocalization and output of the marker gene database: 
+
+python taxon_annotation_ms.py --taxon-list "taxon_list.txt" --input-tree "marker_sets_verify.tree" --endosymbiosis-map "./Endosymbiosis_dict.pkl" --output "./taxon_marker_sets_verify.tsv" 
