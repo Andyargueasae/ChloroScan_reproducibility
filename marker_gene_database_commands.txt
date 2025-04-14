@@ -1,15 +1,23 @@
-The tree inference and generating marker gene databases 
+#The tree inference and generating marker gene databases 
 
-- Input data type: 458 fasta files storing proteins for each gene stored in a directory. 
+#- Input data type: 458 fasta files storing proteins for each gene stored in a directory. 
 
 #Run OrthoFinder: 
 
 orthofinder -f input_directory -t 12  -n “job name” -og 
 
-#Identify orthogroups containing desired genes.  
+#Identify orthogroups containing desired genes, which are saved in ortho_A2K folder, under the directory selected_orthogroups.
+
+#Then, some orthogroups might have inparalogs which are identical to each other, try to deduplicate orthogroups using dedup.sh.
+bash dedup.sh
+
 #   Process input sequences into alignment using mafft. 
 
 mafft --auto --threads 8 input_genes.fasta > output_alignment.aln   
+
+# trim the each gene's alignment using clipkit. 
+
+clipkit input -m smart-gap -o output
 
 #Construct supermatrix (concatenate 22 genes’ alignments into one) 
 
