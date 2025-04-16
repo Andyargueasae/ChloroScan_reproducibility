@@ -36,3 +36,9 @@ python construct_marker_set.py --input-tree "/path/to/A2K.tax_mod.rerooted.reann
 python taxon_annotation_ms.py --taxon-list "taxon_list.txt" \
     --input-tree "marker_sets_verify.tree" --endosymbiosis-map "./Endosymbiosis_dict.pkl" \
     --output "./taxon_marker_sets_verify.tsv"
+
+# After identifying marker genes that will be used in the database, we align the marker genes identified in the orthogroups.
+mafft --auto OG_x.fa > gene.aln
+
+# Then, we create the hmm file using hmmer3.
+hmmbuild gene.hmm gene.aln
