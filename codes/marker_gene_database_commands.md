@@ -95,6 +95,8 @@ bash scripts_used_for_preprocessing_orthogroup_sequences/hmmbuild.sh --aln_dir p
 
 Finally, create a directory called database with such structure:
 binny_Chloroscan/A2K_database
+
+```sh
 ├── hmms
 │   └── checkm_pf
 │       ├── checkm_filtered_pf.hmm
@@ -111,6 +113,7 @@ binny_Chloroscan/A2K_database
 ├── pfam
 │   └── tigrfam2pfam.tsv
 └── taxon_marker_sets_lineage_sorted.tsv
+```
 
 Here, ``taxon_marker_sets_lineage_sorted.tsv`` is the tsv file that provides all marker sets available to use, and the ``hmms`` directory stores combined hmms in ``checkm_filtered_pf_chunk_0.hmm``. We retained the names of those files from the original database used by the original version of binny that targets prokaryote MAGs.   
 
