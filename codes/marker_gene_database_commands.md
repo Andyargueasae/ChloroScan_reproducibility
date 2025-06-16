@@ -5,7 +5,7 @@
 ``output directory``: orthofinder's results containing all orthogroups and basic information summary, such as the sinle-copy orthogroups.
 
 ```sh
-orthofinder -f backup_for_manuscript1_IMPORTANT/section_1_marker_gene_database/458_genomes_selected \
+orthofinder -f /path/to/458_genomes_selected \
 -t 12  -n “job name” -og 
 ```
 ## 2. Identify orthogroups containing desired genes, which are saved in ortho_A2K folder, under the directory /ortho_A2K/Orthogroups_selected.
@@ -13,7 +13,7 @@ orthofinder -f backup_for_manuscript1_IMPORTANT/section_1_marker_gene_database/4
 To simplify the downstream process, I renamed each sequence's header to "species_name|protein_id|gene_name".
 
 ```sh
-for i in backup_for_manuscript1_IMPORTANT/ortho_A2K/Orthogroups_selected/*.fasta; do
+for i in ortho_A2K/Orthogroups_selected/*.fasta; do
     python rename_orthogroup.py $i backup_for_manuscript1_IMPORTANT/section_1_marker_gene_database/selected_orthogroups/$(basename $i .fasta).fasta
 ```
 
