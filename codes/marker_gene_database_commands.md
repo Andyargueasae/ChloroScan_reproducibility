@@ -3,8 +3,10 @@
 ``Note``: All essential files used in this section can be found in ``marker_gene_database_files.tar.gz``, in the same github repository.
 
 ## 1. Run OrthoFinder:
-``Input data type``: 458 fasta files storing proteins for each gene stored in a directory. 
-``output data type``: orthofinder's results containing all orthogroups and basic information summary, such as the sinle-copy orthogroups.
+``Input data type``: 
+ - 458 fasta files storing proteins for each gene stored in a directory. 
+``output data type``: 
+ - orthofinder's results containing all orthogroups and basic information summary, such as the sinle-copy orthogroups.
 
 ```sh
 orthofinder -f /path/to/458_genomes_selected \
@@ -12,8 +14,10 @@ orthofinder -f /path/to/458_genomes_selected \
 ```
 ## 2. Identify orthogroups containing desired genes, preprocess them by renaming headers and deduplications.
 
-``Input data type``: each selected orthogroup's fasta file.
-``output data type``: selected orthogroup's fasta file with header in "species_name|protein_id|gene_name".
+``Input data type``: 
+ - each selected orthogroup's fasta file.
+``output data type``: 
+ - selected orthogroup's fasta file with header in "species_name|protein_id|gene_name".
 
 ```sh
 for i in ortho_A2K/Orthogroups_selected/*.fasta; do
@@ -22,8 +26,10 @@ for i in ortho_A2K/Orthogroups_selected/*.fasta; do
 
 Then, some orthogroups might have inparalogs which are identical to each other, try to deduplicate orthogroups using dedup.sh.
 
-``Input data type``: each renamed and selected orthogroup's fasta file.
-``output data type``: deduplicated genes, with inparalogs and genes of same annotation dereplicated to retain one sequence per gene.
+``Input data type``: 
+ - each renamed and selected orthogroup's fasta file.
+``output data type``: 
+ - deduplicated genes, with inparalogs and genes of same annotation dereplicated to retain one sequence per gene.
 
 ```sh
 bash dedup.sh --fpath backup_for_manuscript1_IMPORTANT/section_1_marker_gene_database/selected_orthogroups --opath backup_for_manuscript1_IMPORTANT/section_1_marker_gene_database/intermediary_files_for_preprocessing_alignments/deduplicated_genes --scriptpath backup_for_manuscript1_IMPORTANT/section_1_marker_gene_database/scripts_used_for_preprocessing_orthogroup_sequences
@@ -33,8 +39,10 @@ bash dedup.sh --fpath backup_for_manuscript1_IMPORTANT/section_1_marker_gene_dat
 
 ## 3. Process input sequences into alignment using mafft. (need a for loop)
 
-``Input data type``: renamed, deduplicated genes' fasta file.
-``Output data type``" alignment file produced by mafft.
+``Input data type``: 
+ - renamed, deduplicated genes' fasta file.
+``Output data type``: 
+ - alignment file produced by mafft.
 
 
 ```sh
@@ -48,8 +56,10 @@ done
 rename the header for each sequence that only retains taxon name.
 
 ## 4. Construct supermatrix (concatenate 22 genes’ alignments into one) 
-``Input data``: a tsv file storing 22 genes' alignment file link. 
-``Output data``: supermatrix-the concatenated alignment from 22 genes' aln file. 
+``Input data``: 
+ - a tsv file storing 22 genes' alignment file link. 
+``Output data``: 
+ - supermatrix-the concatenated alignment from 22 genes' aln file. 
 
 ```sh
 phykit create_concatenation_matrix --alignment alignment_list.tsv --prefix A2K.phylo 
@@ -57,8 +67,10 @@ phykit create_concatenation_matrix --alignment alignment_list.tsv --prefix A2K.p
 One of the output: A2K.phylo.fa will be the concatenated alignment of 22 genes and will be the input of iqtree2.  
 
 ## 5. Infer a maximum Likelihood Tree from the constructed supermatrix.
-``Input data``: concatenated alignment of 22 genes from 458 input genomes. 
-``Output data``: a maximum-likelihood tree infering phylogenetic relationships of 458 input genomes.  
+``Input data``: 
+ - concatenated alignment of 22 genes from 458 input genomes. 
+``Output data``: 
+ - a maximum-likelihood tree infering phylogenetic relationships of 458 input genomes.  
 
 ```sh
 iqtree -s /path/to/A2K.phylo.fa -bb 1000 -m TEST -nt 8 -redo -pre A2K
@@ -108,8 +120,10 @@ We also included a list of 34 genes with each of them regarded as single marker 
 ## 8. Align included genes.
 
 After identifying marker genes that will be used in the database, we align the marker genes identified in the orthogroups (A manual selection).
-``Input data``: The selected orthogroups/genes which are present in the taxon marker sets tsv file.
-``Output data``: alignment of selected genes.
+``Input data``: 
+ - The selected orthogroups/genes which are present in the taxon marker sets tsv file.
+``Output data``: 
+ - alignment of selected genes.
 
 ```sh
 for selected_OGs in $(ls selected_OGs); do
@@ -119,8 +133,10 @@ done
 
 ## 9. Build profile HMM.
 Then, we create the hmm file for these genes using hmmer3.
-``Input data``: alignment directory containing all genes present in marker sets.
-``Output data``: directory of profile hidden markov models for each gene.
+``Input data``: 
+ - alignment directory containing all genes present in marker sets.
+``Output data``: 
+ - directory of profile hidden markov models for each gene.
 
 ```sh
 bash scripts_used_for_preprocessing_orthogroup_sequences/hmmbuild.sh --aln_dir path/to/aln_dir --hmm_dir path/to/hmm_dir
