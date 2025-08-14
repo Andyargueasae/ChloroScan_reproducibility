@@ -72,14 +72,16 @@ bash $SCRIPT_DIR/dedup.sh --fpath reproducibility/selected_orthogroups --opath r
 
 ```sh 
 NUM_GENOMES=458
+mkdir -p reproducibility/deduplicated_genes2
 for file in $(ls reproducibility/deduplicated_genes); do
     if [[ $(cat reproducibility/deduplicated_genes/$file | grep -c ">") -gt $NUM_GENOMES ]]; then
         # do something.
         echo "$file has extra copies, potentially the same gene annotated with two sequences."
         echo "Should remove the shorter one".
-        python $SCRIPT_DIR/remove_extra_annotations.py -i reproducibility/deduplicated_genes/$file -o reproducibility/deduplicated_genes/$file
+        python $SCRIPT_DIR/remove_extra_annotations.py -i reproducibility/deduplicated_genes/$file -o reproducibility/deduplicated_genes2/$file
     else
         echo "$file has matching number of entries, skip."
+        cp reproducibility/deduplicated_genes/$file reproducibility/deduplicated_genes2/$file
     fi
 done
 ```
@@ -94,17 +96,22 @@ done
 
 
 ```sh
-
-for i in $(ls reproducibility/deduplicated_genes); do
-    mafft --auto --threads 8 reproducibility/deduplicated_genes/$i > reproducibility/deduplicated_aligned_genes/$(basename $i .fasta).aln
+mkdir -p reproducibility/deduplicated_aligned_genes
+for i in $(ls reproducibility/deduplicated_genes2); do
+    mafft --auto --thread 8 reproducibility/deduplicated_genes2/$i > reproducibility/deduplicated_aligned_genes/$(basename $i .fasta).aln
 done
 ```
 
 rename the header for each sequence that only retains taxon name.
 
 ```sh
+mkdir -p reproducibility/renamed_alignments 
 
+for file in $(ls reproducibility/deduplicated_aligned_genes/); do
+    python $SCRIPT_DIR/rename_alignment.py reproducibility/deduplicated_aligned_genes/$file reproducibility/renamed_alignments/$file
+done
 ```
+Doing steps above is to make sure that no bugs will arise in step 4, as duplicated genes and uneven alignment length causes phykit create_concatenation_matrix to fail.
 
 ## 4. Construct supermatrix (concatenate 22 genes’ alignments into one) 
 
@@ -118,9 +125,9 @@ rename the header for each sequence that only retains taxon name.
 # prepare alignment_list.tsv.
 mkdir -p reproducibility/supermatrix
 
-for file in $(ls reproducibility/deduplicated_aligned_genes);do
-    echo $(realpath reproducibility/deduplicated_aligned_genes/$file);
-done > reproducibility/alignment_list.tsv
+for file in reproducibility/renamed_alignments/*;do
+    realpath $file;
+done | sed 's/\x1b\[[0-9;]*[a-zA-Z]//g' > reproducibility/alignment_list.tsv
 
 phykit create_concatenation_matrix --alignment reproducibility/alignment_list.tsv --prefix reproducibility/supermatrix/A2K.phylo 
 ```
