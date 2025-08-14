@@ -30,9 +30,10 @@ References can be found in ``marker_gene_database/data_exploration_plastids/A2K.
  - orthofinder's results containing all orthogroups and basic information summary, such as the sinle-copy orthogroups.
 
 ```sh
-orthofinder -f /path/to/458_genomes_selected \
--t 12  -n “job name” -og 
+orthofinder -f ChloroScan_reproducibility/marker_gene_database/458_genomes_selected \
+-t 20  -n "plastid_marker_gene_db" -og 
 ```
+The running time of this step may take about 3 hours. 
 
 
 ## 2. Identify orthogroups containing desired genes, preprocess them by renaming headers and deduplications.
@@ -75,10 +76,12 @@ for file in $(ls reproducibility/deduplicated_genes); do
     if [[ $(cat reproducibility/deduplicated_genes/$file | grep -c ">") -gt $NUM_GENOMES ]]; then
         # do something.
         echo "$file has extra copies, potentially the same gene annotated with two sequences."
-        echo "Should remove the shorter one".   
+        echo "Should remove the shorter one".
+        python $SCRIPT_DIR/remove_extra_annotations.py -i reproducibility/deduplicated_genes/$file -o reproducibility/deduplicated_genes/$file
+    else
+        echo "$file has matching number of entries, skip."
     fi
 done
-
 ```
 
 ## 3. Process input sequences into alignment using mafft, and rename the sequence headers again.
@@ -91,10 +94,9 @@ done
 
 
 ```sh
-alignment_dir="backup_for_manuscript1_IMPORTANT/section_1_marker_gene_database/intermediary_files_for_preprocessing_alignments/deduplicated_aligned_genes"
 
-for i in $(ls backup_for_manuscript1_IMPORTANT/section_1_marker_gene_database/intermediary_files_for_preprocessing_alignments/deduplicated_genes); do
-    mafft --auto --threads 8 $i > backup_for_manuscript1_IMPORTANT/section_1_marker_gene_database/intermediary_files_for_preprocessing_alignments/deduplicated_aligned_genes/$(basename $i .fasta).aln   
+for i in $(ls reproducibility/deduplicated_genes); do
+    mafft --auto --threads 8 reproducibility/deduplicated_genes/$i > reproducibility/deduplicated_aligned_genes/$(basename $i .fasta).aln
 done
 ```
 
@@ -113,7 +115,14 @@ rename the header for each sequence that only retains taxon name.
  - supermatrix-the concatenated alignment from 22 genes' aln file. 
 
 ```sh
-phykit create_concatenation_matrix --alignment alignment_list.tsv --prefix A2K.phylo 
+# prepare alignment_list.tsv.
+mkdir -p reproducibility/supermatrix
+
+for file in $(ls reproducibility/deduplicated_aligned_genes);do
+    echo $(realpath reproducibility/deduplicated_aligned_genes/$file);
+done > reproducibility/alignment_list.tsv
+
+phykit create_concatenation_matrix --alignment reproducibility/alignment_list.tsv --prefix reproducibility/supermatrix/A2K.phylo 
 ```
 One of the output: A2K.phylo.fa will be the concatenated alignment of 22 genes and will be the input of iqtree2.  
 
@@ -126,7 +135,8 @@ One of the output: A2K.phylo.fa will be the concatenated alignment of 22 genes a
  - a maximum-likelihood tree infering phylogenetic relationships of 458 input genomes.  
 
 ```sh
-iqtree -s /path/to/A2K.phylo.fa -bb 1000 -m TEST -nt 8 -redo -pre A2K
+mkdir -p reproducibility/tree
+iqtree -s reproducibility/supermatrix/A2K.phylo.fa -bb 1000 -m TEST -nt 8 -redo -pre reproducibility/tree/A2K
 ```
 
 After running the codes above, a phylogenetic tree for 458 plastid genomes is generated. 
@@ -141,8 +151,12 @@ Next, following CheckM's rationale (https://pmc.ncbi.nlm.nih.gov/articles/PMC448
 ``Output data``:
  - ``output tree``: the original tree file decorated with single-copy marker genes for each internal node.   
 
+``note``: the tree should be firstly preprocessed and rerooted by setting Paulinella as the root. 
+
 ```sh
-python construct_marker_set.py --input-tree "/path/to/A2K.tax_mod.rerooted.reannotated.treefile"  --node-wise True --output-tree marker_sets_verify.tree --species-genome-dict /path/to/species_genome_effective_dict.pkl 
+mkdir -p reproducibility/marker_gene_database
+
+python construct_marker_set.py --input-tree "reproducibility/supermatrix/A2K.tax_mod.rerooted.reannotated.treefile"  --node-wise True --output-tree reproducibility/marker_gene_database/marker_sets_verify.tree --species-genome-dict /path/to/species_genome_effective_dict.pkl 
 ```
 
 ## 7. Then, the marker genes will be collocated into marker sets, following settings in original checkm. 
@@ -181,6 +195,8 @@ After identifying marker genes that will be used in the database, we align the m
 
 ``Output data``: 
  - alignment of selected genes.
+
+Note: the selected genes' naming is already summarized.
 
 ```sh
 for selected_OGs in $(ls selected_OGs); do
