@@ -4,7 +4,8 @@
 
 ## 1. Run OrthoFinder:
 ``Input data type``: 
- - 458 fasta files storing proteins for each gene stored in a directory. 
+ - 458 fasta files storing proteins for each gene stored in a directory.
+ 
 ``output data type``: 
  - orthofinder's results containing all orthogroups and basic information summary, such as the sinle-copy orthogroups.
 
@@ -16,6 +17,7 @@ orthofinder -f /path/to/458_genomes_selected \
 
 ``Input data type``: 
  - each selected orthogroup's fasta file.
+
 ``output data type``: 
  - selected orthogroup's fasta file with header in "species_name|protein_id|gene_name".
 
@@ -28,6 +30,7 @@ Then, some orthogroups might have inparalogs which are identical to each other, 
 
 ``Input data type``: 
  - each renamed and selected orthogroup's fasta file.
+
 ``output data type``: 
  - deduplicated genes, with inparalogs and genes of same annotation dereplicated to retain one sequence per gene.
 
@@ -41,6 +44,7 @@ bash dedup.sh --fpath backup_for_manuscript1_IMPORTANT/section_1_marker_gene_dat
 
 ``Input data type``: 
  - renamed, deduplicated genes' fasta file.
+
 ``Output data type``: 
  - alignment file produced by mafft.
 
@@ -58,6 +62,7 @@ rename the header for each sequence that only retains taxon name.
 ## 4. Construct supermatrix (concatenate 22 genes’ alignments into one) 
 ``Input data``: 
  - a tsv file storing 22 genes' alignment file link. 
+
 ``Output data``: 
  - supermatrix-the concatenated alignment from 22 genes' aln file. 
 
@@ -69,6 +74,7 @@ One of the output: A2K.phylo.fa will be the concatenated alignment of 22 genes a
 ## 5. Infer a maximum Likelihood Tree from the constructed supermatrix.
 ``Input data``: 
  - concatenated alignment of 22 genes from 458 input genomes. 
+
 ``Output data``: 
  - a maximum-likelihood tree infering phylogenetic relationships of 458 input genomes.  
 
@@ -83,6 +89,7 @@ Next, following CheckM's rationale (https://pmc.ncbi.nlm.nih.gov/articles/PMC448
 ``Input data``:
  - ``treefile``: the resulting maximum likelihood tree.
  - ``species_genome_effective_dict.pkl``: a python dictionary pairing genomes with gene contents and genbank id for each source genomes.  
+
 ``Output data``:
  - ``output tree``: the original tree file decorated with single-copy marker genes for each internal node.   
 
@@ -122,6 +129,7 @@ We also included a list of 34 genes with each of them regarded as single marker 
 After identifying marker genes that will be used in the database, we align the marker genes identified in the orthogroups (A manual selection).
 ``Input data``: 
  - The selected orthogroups/genes which are present in the taxon marker sets tsv file.
+
 ``Output data``: 
  - alignment of selected genes.
 
@@ -135,6 +143,7 @@ done
 Then, we create the hmm file for these genes using hmmer3.
 ``Input data``: 
  - alignment directory containing all genes present in marker sets.
+
 ``Output data``: 
  - directory of profile hidden markov models for each gene.
 
