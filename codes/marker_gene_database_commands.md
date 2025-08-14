@@ -2,6 +2,25 @@
 
 ``Note``: All essential files used in this section can be found in ``marker_gene_database_files.tar.gz``, in the same github repository.
 
+First, clone the repository and unzip the tar.gz file. 
+
+```sh
+git clone https://github.com/Andyargueasae/ChloroScan_reproducibility.git
+cd ChloroScan_reproducibility/
+tar zxvf marker_gene_database_files.tar.gz
+
+SCRIPT_DIR="/data/ChloroScan_reproducibility/marker_gene_database/scripts_used_for_preprocessing_orthogroup_sequences"
+PYTHON_SCRIPT_DIR="/data/ChloroScan_reproducibility/marker_gene_database/python_scripts_for_generating_marker_sets"
+
+mkdir -p reproducibility
+```
+
+Previous exploration using the 913 plastid genomes of unique species found 22 genes: atpA, atpB, atpH, petB, psaB, psaC, psbA, psbE, psbH, rpl14, rpl16, rpl2, rpl20, rpoA, rpoC1, rps11, rps12, rps14, rps19, rps3, rps7, rps8. 
+
+ - These genes are present in >= 97% of genomes, so we chose them to conduct the downstream analyses. We used these genes to filter the genomes, and finally chose 458 genomes (with one genome per genus) to conduct downstream analyses. 
+
+References can be found in ``marker_gene_database/data_exploration_plastids/A2K.ipynb``.
+
 ## 1. Run OrthoFinder:
 
 ``Input data type``: 
@@ -14,6 +33,8 @@
 orthofinder -f /path/to/458_genomes_selected \
 -t 12  -n “job name” -og 
 ```
+
+
 ## 2. Identify orthogroups containing desired genes, preprocess them by renaming headers and deduplications.
 
 ``Input data type``: 
@@ -23,8 +44,12 @@ orthofinder -f /path/to/458_genomes_selected \
  - selected orthogroup's fasta file with header in "species_name|protein_id|gene_name".
 
 ```sh
-for i in ortho_A2K/Orthogroups_selected/*.fasta; do
-    python rename_orthogroup.py $i backup_for_manuscript1_IMPORTANT/section_1_marker_gene_database/selected_orthogroups/$(basename $i .fasta).fasta
+
+mkdir -p reproducibility/selected_orthogroups
+
+for i in marker_gene_database/Orthogroups_selected/*.fasta; do
+    python $SCRIPT_DIR/rename_orthogroup.py $i ./reproducibility/selected_orthogroups/$(basename $i .fasta).fasta
+done
 ```
 
 Then, some orthogroups might have inparalogs which are identical to each other, try to deduplicate orthogroups using dedup.sh.
@@ -36,12 +61,27 @@ Then, some orthogroups might have inparalogs which are identical to each other, 
  - deduplicated genes, with inparalogs and genes of same annotation dereplicated to retain one sequence per gene.
 
 ```sh
-bash dedup.sh --fpath backup_for_manuscript1_IMPORTANT/section_1_marker_gene_database/selected_orthogroups --opath backup_for_manuscript1_IMPORTANT/section_1_marker_gene_database/intermediary_files_for_preprocessing_alignments/deduplicated_genes --scriptpath backup_for_manuscript1_IMPORTANT/section_1_marker_gene_database/scripts_used_for_preprocessing_orthogroup_sequences
+
+mkdir -p reproducibility/deduplicated_genes
+
+bash $SCRIPT_DIR/dedup.sh --fpath reproducibility/selected_orthogroups --opath reproducibility/deduplicated_genes --scriptpath $SCRIPT_DIR
 ```
 
-``Note``: some orthogroups have genes annotated with two different sequences, which are not inparalogs, we deduplicated them further by retaining only the longer seqeunce and labelled them as "dedup2". This is a manual process, and the results are provided. 
+``Note``: some orthogroups have genes annotated with two different sequences, which are not inparalogs, we deduplicated them further by retaining only the longer seqeunce and labelled them as "dedup2".
 
-## 3. Process input sequences into alignment using mafft. (need a for loop)
+```sh 
+NUM_GENOMES=458
+for file in $(ls reproducibility/deduplicated_genes); do
+    if [[ $(cat reproducibility/deduplicated_genes/$file | grep -c ">") -gt $NUM_GENOMES ]]; then
+        # do something.
+        echo "$file has extra copies, potentially the same gene annotated with two sequences."
+        echo "Should remove the shorter one".   
+    fi
+done
+
+```
+
+## 3. Process input sequences into alignment using mafft, and rename the sequence headers again.
 
 ``Input data type``: 
  - renamed, deduplicated genes' fasta file.
@@ -59,6 +99,10 @@ done
 ```
 
 rename the header for each sequence that only retains taxon name.
+
+```sh
+
+```
 
 ## 4. Construct supermatrix (concatenate 22 genes’ alignments into one) 
 
