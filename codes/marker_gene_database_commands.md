@@ -3,6 +3,7 @@
 ``Note``: All essential files used in this section can be found in ``marker_gene_database_files.tar.gz``, in the same github repository.
 
 ## 1. Run OrthoFinder:
+
 ``Input data type``: 
  - 458 fasta files storing proteins for each gene stored in a directory.
  
@@ -60,6 +61,7 @@ done
 rename the header for each sequence that only retains taxon name.
 
 ## 4. Construct supermatrix (concatenate 22 genes’ alignments into one) 
+
 ``Input data``: 
  - a tsv file storing 22 genes' alignment file link. 
 
@@ -72,6 +74,7 @@ phykit create_concatenation_matrix --alignment alignment_list.tsv --prefix A2K.p
 One of the output: A2K.phylo.fa will be the concatenated alignment of 22 genes and will be the input of iqtree2.  
 
 ## 5. Infer a maximum Likelihood Tree from the constructed supermatrix.
+
 ``Input data``: 
  - concatenated alignment of 22 genes from 458 input genomes. 
 
@@ -86,6 +89,7 @@ After running the codes above, a phylogenetic tree for 458 plastid genomes is ge
 Next, following CheckM's rationale (https://pmc.ncbi.nlm.nih.gov/articles/PMC4484387/), the tree is decorated with marker genes for each internal node.   
 
 ## 6. The lineage-specific marker set calculation for each internal node of the tree from iqtree2 outputs: 
+
 ``Input data``:
  - ``treefile``: the resulting maximum likelihood tree.
  - ``species_genome_effective_dict.pkl``: a python dictionary pairing genomes with gene contents and genbank id for each source genomes.  
@@ -127,6 +131,7 @@ We also included a list of 34 genes with each of them regarded as single marker 
 ## 8. Align included genes.
 
 After identifying marker genes that will be used in the database, we align the marker genes identified in the orthogroups (A manual selection).
+
 ``Input data``: 
  - The selected orthogroups/genes which are present in the taxon marker sets tsv file.
 
@@ -141,6 +146,7 @@ done
 
 ## 9. Build profile HMM.
 Then, we create the hmm file for these genes using hmmer3.
+
 ``Input data``: 
  - alignment directory containing all genes present in marker sets.
 
