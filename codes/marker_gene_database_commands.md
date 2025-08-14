@@ -157,6 +157,8 @@ Then, we create the hmm file for these genes using hmmer3.
 bash scripts_used_for_preprocessing_orthogroup_sequences/hmmbuild.sh --aln_dir path/to/aln_dir --hmm_dir path/to/hmm_dir
 ```
 
+## Results
+
 Finally, create a directory called database with such structure:
 binny_Chloroscan/A2K_database
 
