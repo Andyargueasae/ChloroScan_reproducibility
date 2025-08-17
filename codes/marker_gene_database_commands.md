@@ -9,8 +9,8 @@ git clone https://github.com/Andyargueasae/ChloroScan_reproducibility.git
 cd ChloroScan_reproducibility/
 tar zxvf marker_gene_database_files.tar.gz
 
-SCRIPT_DIR="/data/ChloroScan_reproducibility/marker_gene_database/scripts_used_for_preprocessing_orthogroup_sequences"
-PYTHON_SCRIPT_DIR="/data/ChloroScan_reproducibility/marker_gene_database/python_scripts_for_generating_marker_sets"
+SCRIPT_DIR="/path/to/ChloroScan_reproducibility/marker_gene_database/scripts_used_for_preprocessing_orthogroup_sequences"
+PYTHON_SCRIPT_DIR="/path/to/ChloroScan_reproducibility/marker_gene_database/python_scripts_for_generating_marker_sets"
 
 # Make a directory to save all intermediary files in here. 
 mkdir -p reproducibility
@@ -175,7 +175,7 @@ Before going to single copy marker gene calculation, the tree has to be modified
 ```sh
 mkdir -p reproducibility/marker_gene_database
 
-python $PYTHON_DIR/construct_marker_set.py --input-tree "reproducibility/supermatrix/A2K.tax_mod.rerooted.reannotated.treefile"  --node-wise True --output-tree reproducibility/marker_gene_database/marker_sets_verify.tree --species-genome-dict /path/to/species_genome_effective_dict.pkl 
+python $PYTHON_SCRIPT_DIR/construct_marker_set.py --input-tree "marker_gene_database/taxon_annotated_treefiles_and_marker_set_decorated_tree_files/A2K.tax_mod.rerooted.reannotated.treefile"  --node-wise True --output-tree reproducibility/marker_gene_database/marker_sets_verify.tree --species-genome-dict marker_gene_database/required_files_for_generating_marker_gene_database/species_genome_effective_dict.pkl 
 ```
 
 ## 7. Then, the marker genes will be collocated into marker sets, following settings in original checkm. 
@@ -190,13 +190,13 @@ python $PYTHON_DIR/construct_marker_set.py --input-tree "reproducibility/superma
  - ``taxon_marker_set.tsv``: a tsv file working as the reference table for binny to estimate the MAG quality based on single-copy marker genes. 
 
 ```sh
-python $PYTHON_DIR/taxon_annotation_ms.py --taxon-list "taxon_list.txt" --input-tree "marker_sets_verify.tree" --endosymbiosis-map "./Endosymbiosis_dict.pkl" --output "./taxon_marker_sets_verify.tsv" --discarded ChloroScan_reproducibility/marker_gene_database/required_files_for_generating_marker_gene_database/20240829113905_discarded_1.txt 
+python $PYTHON_SCRIPT_DIR/taxon_annotation_ms.py --taxon-list "marker_gene_database/required_files_for_generating_marker_gene_database/taxon_list.txt" --input-tree "reproducibility/marker_gene_database/marker_sets_verify.tree" --endosymbiosis-map "marker_gene_database/required_files_for_generating_marker_gene_database/Endosymbiosis_dict.pkl" --output "reproducibility/marker_gene_database/taxon_marker_sets.tsv" --discarded marker_gene_database/required_files_for_generating_marker_gene_database/20240829113905_discarded_1.txt --genbank-dir marker_gene_database/genbanks_dir/ 
 ```
 
 The marker sets we have now should contain a universal marker gene set to be completely functional. So we calculate the marker set containing single-copy marker genes found in > 97% of genomes and colocalize them into marker sets.
 
 ```sh
-python $PYTHON_DIR/taxon_annotation_ms.py --universal-marker-set True --input-tree /path/to/A2K.tax_mod.rerooted.reannotated.treefile --universal-marker-set-out "/path/to/universal_marker_set.tsv"
+python $PYTHON_SCRIPT_DIR/taxon_annotation_ms.py --universal-marker-set True --input-tree /path/to/A2K.tax_mod.rerooted.reannotated.treefile --universal-marker-set-out "/path/to/universal_marker_set.tsv"
 ```
 
 The marker set is then concatenated at the top of the other marker sets.
