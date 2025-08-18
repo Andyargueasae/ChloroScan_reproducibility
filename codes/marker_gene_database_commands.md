@@ -196,14 +196,21 @@ python $PYTHON_SCRIPT_DIR/taxon_annotation_ms.py --taxon-list "marker_gene_datab
 The marker sets we have now should contain a universal marker gene set to be completely functional. So we calculate the marker set containing single-copy marker genes found in > 97% of genomes and colocalize them into marker sets.
 
 ```sh
-python $PYTHON_SCRIPT_DIR/taxon_annotation_ms.py --universal-marker-set True --input-tree /path/to/A2K.tax_mod.rerooted.reannotated.treefile --universal-marker-set-out "/path/to/universal_marker_set.tsv"
+python marker_gene_database/python_scripts_for_generating_marker_sets/taxon_annotation_ms.py --universal-marker-set True --input-tree reproducibility/marker_gene_database/marker_sets_verify.tree --universal-marker-set-out "reproducibility/marker_gene_database/taxon_marker_sets_universal.tsv" --genbank-dir marker_gene_database/genbanks_dir/ --species-genome-dict marker_gene_database/required_files_for_generating_marker_gene_database/species_genome_effective_dict.pkl
 ```
 
-The marker set is then concatenated at the top of the other marker sets.
+The marker set is then concatenated at the top of the other marker sets, via a script "postprocess_ms.py"
 
+```sh
+python marker_gene_database/python_scripts_for_generating_marker_sets/postprocess_ms.py reproducibility/marker_gene_database/taxon_marker_sets_universal.tsv reproducibility/marker_gene_database/taxon_marker_sets.tsv reproducibility/taxon_marker_sets_lineage_sorted.tsv
+```
 
 We also included a list of 34 genes with each of them regarded as single marker set, proposed by Janouškovec et al. (2010) into our resulting taxon marker sets file. When we run binny, this marker set can be compared with our data in estimating completeness and purity. 
 
+```sh
+phylum	plastidcore	algae;plastidcore	1	34	34	[set(['acsF']), set(['atpA']), set(['atpB']), set(['atpH']), set(['atpI']), set(['clpC']), set(['petB']), set(['petD']), set(['petG']), set(['petN']), set(['psaA']), set(['psaB']), set(['psaC']), set(['psaD']), set(['psbA']), set(['psbB']), set(['psbC']), set(['psbD']), set(['psbE']), set(['psbF']), set(['psbH']), set(['psbI']), set(['psbJ']), set(['psbK']), set(['psbN']), set(['psbT']), set(['rpl11']), set(['rpl14']), set(['rpl16']), set(['rps12']), set(['rps19']), set(['rps5']), set(['sufB']), set(['tufA'])]
+```
+Simply copy and paste this line to the taxon_marker_sets_lineage_sorted.tsv, just below the line of algae (domain ms) marker set list.
 Now the taxon_marker_sets.tsv file is finished, the other component is to create profile hmms. 
 
 ## 8. Align included genes.
