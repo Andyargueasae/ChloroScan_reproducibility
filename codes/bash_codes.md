@@ -38,25 +38,18 @@ megahit -1 sample_0_01.fq.gz,sample_1_01.fq.gz,sample_2_01.fq.gz,sample_3_01.fq.
 
 ## 4. Benchmarking ChloroScan: 
 
-Run ChloroScan for synthetic metagenomes:
-
-```sh
-chloroscan run --Inputs-assembly=$ASSEMBLY --Inputs-alignment=$ALIGNMENT --Inputs-batch-name=$BATCH_NAME --outputdir=$OUTPUT --use-conda --cores=12 --verbose --corgi-pthreshold=0.5 --binning-clustering-hdbscan-min-sample-range=1,5,10 --binning-bin-quality-purity=90 --binning-outputdir=$BINNY_OUTPUTDIR --corgi-min-length=1500 --force --binning-bin-quality-min-completeness=50 $OUTPUT/working/binny 
-```
-note: When running with real metagenomes, the corgi-pthreshold is set to 0.8 and the contig length cutoff is set to 1000.  
-
 Run metabat2: 
 1. generate metabat2 depth profiles from bam files provided
 ```sh
 Jgi_summarize_bam_contig_depths --outputDepth /path/to/coverage.txt input1.sorted.bam input2.sorted.bam
 ```
 
-2. Run metabat2: 
+2. Run MetaBAT2: 
 ```sh
 metabat2 –i contigs.fasta -a /path/to/coverage.txt -o metabat2 –m 1500 –s 50000
 ```
 
-3. ChloroScan commands for benchmarking datasets:
+ChloroScan commands for benchmarking datasets:
 ```sh
 ASSEMBLY=/path/to/contigs.fasta
 ALIGNMENT=/path/to/bam_dir
