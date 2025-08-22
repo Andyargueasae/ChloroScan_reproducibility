@@ -56,6 +56,31 @@ Jgi_summarize_bam_contig_depths --outputDepth /path/to/coverage.txt input1.sorte
 metabat2 –i contigs.fasta -a /path/to/coverage.txt -o metabat2 –m 1500 –s 50000
 ```
 
+3. ChloroScan commands for benchmarking datasets:
+```sh
+ASSEMBLY=/path/to/contigs.fasta
+ALIGNMENT=/path/to/bam_dir
+BATCH_NAME="your_batch_name"
+OUTPUT=/path/to/output_dir
+
+chloroscan run --Inputs-assembly=$ASSEMBLY \
+    --Inputs-alignment=$ALIGNMENT \
+    --Inputs-batch-name=$BATCH_NAME \
+    --outputdir=$OUTPUT \
+    --use-conda \
+    --conda-prefix="conda_env" \
+    --conda-frontend="mamba" \
+    --cores=12 \
+    --verbose \
+    --corgi-pthreshold=0.5 \
+    --binning-clustering-hdbscan-min-sample-range=1,5,10 \
+    --binning-bin-quality-purity=90 \
+    --binning-outputdir=$BINNY_OUTPUTDIR \
+    --corgi-min-length=1000 \
+    --force \
+    --binning-bin-quality-min-completeness=50
+```
+
 ## 5. Metaquast alignment between filtered contigs and source genomes: 
 ```sh
 metaquast path/to/query.fasta -r path/to/source_genomes/ -t 12 –o output_dir 
