@@ -66,3 +66,22 @@ AMBER is a binning benchmarking tool to compare the performance between 2 or mor
 ```sh
 amber.py -g gsa_mapping.tsv -l “binny,metabat2” binny_mapping.tsv metabat2_mapping.tsv -t 12  
 ```
+
+# 7. Run FragGeneScanRs on resulting bins. 
+After getting new bins from the sample SAMEA2189670, we planned to blast their rbcL genes. So we firstly predicted their genes via FragGeneScanRs: 
+
+```sh
+FragGeneScanRs -s bins.fa -t illumina_5 -p 4 -a bins_genes.faa 
+```
+
+# 8. Run orthofisher to annotate rbcL genes.
+This step has two file inputs:
+ - bins.txt: a one/two column table storing paths to bins. 
+ - hmms.txt: a one-column table storing path of rbcL.hmm.
+Other parameters such as e-value, score and bitscore remained as default values.
+
+```sh
+orthofisher -f bins.txt -m hmms.txt -o output_directory
+```
+
+Results of identified rbcL sequences are saved in output_directory/all_sequences, and the long_summary.txt and short_summary.txt will tell the information of sequence-bin pairing. 
