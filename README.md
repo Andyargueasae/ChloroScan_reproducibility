@@ -3,7 +3,7 @@ Codes used in the ChloroScan benchmarking and data preparations.
 
  - Bash commands used in generating synthetic metagenomes and benchmarking ChloroScan: ``benchmarking_codes.md``. Codes such as downloading NCBI dataset genomes, running binning benchmarking and running binning tools (MetaBAT2/ChloroScan) are here.
 
- ``Note``: ChloroScan v0.1.4 is used here for generating these results, the command to download is: ``pip install chloroscan==0.1.4``.
+ ``Note``: ChloroScan v0.1.5 is used here for generating these results, the command to download is: ``pip install chloroscan==0.1.5``.
 
  - Commands used in generating marker gene database: ``marker_gene_database_commands.md``. Codes used for reproducing a marker gene database are here.
  
