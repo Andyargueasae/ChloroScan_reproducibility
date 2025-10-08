@@ -7,10 +7,14 @@ First, clone the repository and unzip the tar.gz file.
 ```sh
 git clone https://github.com/Andyargueasae/ChloroScan_reproducibility.git
 cd ChloroScan_reproducibility/
-tar zxvf marker_gene_database_files.tar.gz
 
-SCRIPT_DIR="/path/to/ChloroScan_reproducibility/marker_gene_database/scripts_used_for_preprocessing_orthogroup_sequences"
-PYTHON_SCRIPT_DIR="/path/to/ChloroScan_reproducibility/marker_gene_database/python_scripts_for_generating_marker_sets"
+wget --referer=https://figshare.unimelb.edu.au --user-agent="Mozilla/5.0" \
+    -O "marker_gene_database_complete.tar.gz" https://figshare.unimelb.edu.au/ndownloader/files/57355894
+
+tar zxvf marker_gene_database_complete.tar.gz
+
+SCRIPT_DIR="./marker_gene_database/scripts_used_for_preprocessing_orthogroup_sequences"
+PYTHON_SCRIPT_DIR="./marker_gene_database/python_scripts_for_generating_marker_sets"
 
 # Make a directory to save all intermediary files in here. 
 mkdir -p reproducibility
@@ -21,6 +25,8 @@ Previous exploration using the 913 plastid genomes of unique species found 22 ge
  - These genes are present in >= 97% of genomes, so we chose them to conduct the downstream analyses. We used these genes to filter the genomes, and finally chose 458 genomes (with one genome per genus) to conduct downstream analyses. 
 
 References can be found in ``marker_gene_database/data_exploration_plastids/A2K.ipynb``.
+
+A table mapping selected genbank id to the species name is in ``marker_gene_database/list_of_genbanks_used_in_tree.txt``.
 
 ## 1. Run OrthoFinder:
 
@@ -48,7 +54,7 @@ The runtime is about 3 hours. A backup result using the same input genomes is du
 
 mkdir -p reproducibility/selected_orthogroups
 
-for i in marker_gene_database/Orthogroups_selected/*.fasta; do
+for i in ./marker_gene_database/Orthogroups_phylo/*.fasta; do
     python $SCRIPT_DIR/rename_orthogroup.py $i ./reproducibility/selected_orthogroups/$(basename $i .fasta).fasta
 done
 ```
@@ -155,11 +161,14 @@ One of the output: A2K.phylo.fa will be the concatenated alignment of 22 genes a
 mkdir -p reproducibility/tree
 iqtree -s reproducibility/supermatrix/A2K.phylo.fa -bb 1000 -m TEST -nt 8 -redo -pre reproducibility/tree/A2K
 ```
+The whole process will take ca. 5 hours to finish.
 
 After running the codes above, a phylogenetic tree for 458 plastid genomes is generated. 
 Next, following CheckM's rationale (https://pmc.ncbi.nlm.nih.gov/articles/PMC4484387/), the tree is decorated with marker genes for each internal node.
 
 Before going to single copy marker gene calculation, the tree has to be modified by: renaming branches to add taxonomic lineages similar to greengene format: kingdom_phylum_class_order_family_genus_species, this simplifies the identification of node's taxon. The modified tree is provided with the link: ChloroScan_reproducibility/marker_gene_database/taxon_annotated_treefiles_and_marker_set_decorated_tree_files/A2K.tax_mod.rerooted.reannotated.treefile. 
+
+Here we provide the pdf file visualizing the topology for this file: ChloroScan_reproducibility/A2K_tree_structure.pdf. 
 
 ## 6. The lineage-specific marker set calculation for each internal node of the tree from iqtree2 outputs: 
 
@@ -188,6 +197,8 @@ python $PYTHON_SCRIPT_DIR/construct_marker_set.py --input-tree "marker_gene_data
 
 ``Output data``:
  - ``taxon_marker_set.tsv``: a tsv file working as the reference table for binny to estimate the MAG quality based on single-copy marker genes. 
+
+``note``: we chose the taxa names by checking their monophyly and node bootstrapping support, taxa with their node satisfying both and contains big enough number of leaves shall be included. Due to a relatively smaller number of genomes included compared with CheckM's tree, we only calculated marker gene sets for several high-rank groups.    
 
 ```sh
 python $PYTHON_SCRIPT_DIR/taxon_annotation_ms.py --taxon-list "marker_gene_database/required_files_for_generating_marker_gene_database/taxon_list.txt" --input-tree "reproducibility/marker_gene_database/marker_sets_verify.tree" --endosymbiosis-map "marker_gene_database/required_files_for_generating_marker_gene_database/Endosymbiosis_dict.pkl" --output "reproducibility/marker_gene_database/taxon_marker_sets.tsv" --discarded marker_gene_database/required_files_for_generating_marker_gene_database/20240829113905_discarded_1.txt --genbank-dir marker_gene_database/genbanks_dir/ 
@@ -232,7 +243,8 @@ Then, we create the hmm file for these genes using hmmer3.
  - hmmer v3.4.
 
 ```sh
-bash $SCRIPT_DIR/hmmbuild.sh --aln_dir path/to/marker_gene_alignments --hmm_dir path/to/marker_gene_hmms
+mkdir -p reproducibility/hmms
+bash $SCRIPT_DIR/hmmbuild.sh --aln_dir marker_gene_database/marker_gene_alignments --hmm_dir reproducibility/hmms
 ```
 
 ## 10. Press HMMS and create database.
@@ -243,8 +255,8 @@ Binny's database requires the HMMs to be concatenated into a large HMM file, pre
  - hmmer v3.4.
 
 ```sh
-cat /home/student.unimelb.edu.au/yuhtong/andy/data/ChloroScan_reproducibility/marker_gene_database/marker_gene_hmms/* >> checkm_filtered_pf.hmm
-hmmpress checkm_filtered_pd.hmm
+cat ChloroScan_reproducibility/marker_gene_database/new_hmms/* >> checkm_filtered_pf.hmm
+hmmpress checkm_filtered_pf.hmm
 ```
 
 ## Results
@@ -270,6 +282,8 @@ Finally, create a directory called database with such structure:
 └── taxon_marker_sets_lineage_sorted.tsv
 ```
 
-Here, ``taxon_marker_sets_lineage_sorted.tsv`` is the tsv file that provides all marker sets available to use, and the ``hmms`` directory stores combined hmms in ``checkm_filtered_pf_chunk_0.hmm``. Hmms are then separated into chunks required by binny. Because the total number of HMMs is 232, we don't split them into smaller chunks, and rather we copy it directly to be chunk 0. We retained the names of those files from the original database used by the original version of binny. The folder ``pfam`` contains the mapping information of PFAM families to TIGRFAM families from the original CheckM database, it is no longer used since we only have plastid proteins in hmm files. But to maintain the original CheckM directory structure we did not remove this file. 
+we offer an example in ``ChloroScan_reproducibility/marker_gene_database/marker_gene_database``.
 
-Move the directory into binny's directory (the version used in ChloroScan). Finally, change the binny_mantis.cfg file to enable binny's workflow to use this database. 
+Here, ``taxon_marker_sets_lineage_sorted.tsv`` is the tsv file we just created that provides all marker sets available to use, and the ``hmms`` directory stores combined hmms in ``checkm_filtered_pf_chunk_0.hmm``. Hmms are then separated into chunks required by binny. Because the total number of HMMs is not impacting the performance of annotation, we did not split more chunks from it. We retained the names of those files from the original database used by the original version of binny. The folder ``pfam`` contains the mapping information of PFAM families to TIGRFAM families from the original CheckM database, it is no longer used since we only have plastid proteins in hmm files. But to maintain the original CheckM directory structure we did not remove this file. 
+
+Then we moved this to binny and implemented it to ChloroScan. It is automatically loaded while running ChloroScan conda environments building.

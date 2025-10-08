@@ -6,7 +6,7 @@ And the commands of amber, metaquast and metabat2.
 
 ## 1. Generate Simulated Metagenomes:
 
- - Download genomes from NCBI dataset 
+ - Download prokaryote genomes from NCBI dataset 
 
 ```sh    
 datasets download accession_id --include genome 
@@ -74,25 +74,20 @@ chloroscan run --Inputs-assembly=$ASSEMBLY \
     --binning-bin-quality-min-completeness=50
 ```
 
-## 5. Metaquast alignment between filtered contigs and source genomes: 
-```sh
-metaquast path/to/query.fasta -r path/to/source_genomes/ -t 12 –o output_dir 
-```
-
-## 6. Run amber: 
+## 5. Run amber: 
 AMBER is a binning benchmarking tool to compare the performance between 2 or more metagenomic binners with golden standard mapping information.  
 ```sh
 amber.py -g gsa_mapping.tsv -l “binny,metabat2” binny_mapping.tsv metabat2_mapping.tsv -t 12  
 ```
 
-# 7. Run FragGeneScanRs on resulting bins. 
-After getting new bins from the sample SAMEA2189670, we planned to blast their rbcL genes. So we firstly predicted their genes via FragGeneScanRs: 
+# 6. Run FragGeneScanRs on resulting bins. 
+After getting new bins from the sample SAMEA2732360 and SAMEA2189670, we planned to blast their rbcL genes. So we firstly predicted their genes via FragGeneScanRs: 
 
 ```sh
-FragGeneScanRs -s bins.fa -t illumina_5 -p 4 -a bins_genes.faa 
+FragGeneScanRs -s bins.fa -t illumina_5 -p 4 -a bins_genes.faa -n bins_genes.fna
 ```
 
-# 8. Run orthofisher to annotate rbcL genes.
+# 7. Run orthofisher to annotate rbcL genes.
 This step has two file inputs:
  - bins.txt: a one/two column table storing paths to bins. 
  - hmms.txt: a one-column table storing path of rbcL.hmm.
