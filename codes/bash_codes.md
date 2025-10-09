@@ -55,6 +55,7 @@ ASSEMBLY=/path/to/contigs.fasta
 ALIGNMENT=/path/to/bam_dir
 BATCH_NAME="your_batch_name"
 OUTPUT=/path/to/output_dir
+BINNY_OUTPUTDIR=/path/to/binny_output_directory
 
 chloroscan run --Inputs-assembly=$ASSEMBLY \
     --Inputs-alignment=$ALIGNMENT \
