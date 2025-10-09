@@ -10,6 +10,6 @@ Codes used in the ChloroScan benchmarking and data preparations.
  - OrthoFinder outputs and the scripts and files involved in generating the marker gene database are dumped here: https://doi.org/10.26188/28722788. A copy of result files and intermediary files for generating marker gene database is in ``marker_gene_database_complete.tar.gz``. Before running codes in ``./codes/marker_gene_database_commands.md``, please download the files from figshare. The command to download is:
 
 ```sh
-    wget --referer=https://figshare.unimelb.edu.au --user-agent="Mozilla/5.0" -O "marker_gene_database_complete.tar.gz" https://figshare.unimelb.edu.au/ndownloader/files/57355894
+    wget --referer=https://figshare.unimelb.edu.au --user-agent="Mozilla/5.0" -O "marker_gene_database_complete.tar.gz" https://figshare.unimelb.edu.au/ndownloader/files/58584934
 
 ```
