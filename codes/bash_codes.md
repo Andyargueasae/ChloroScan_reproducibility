@@ -1,7 +1,7 @@
 # Bash commands used in ChloroScan
 
 The following commands are used to generate synthetic metagenomes, including assembling, mapping reads.
-And the commands of amber, metaquast and metabat2.
+We also provide commands of running amber, metabat2, ChloroScan, FragGeneScanRs and orthofisher.
 
 
 ## 1. Generate Simulated Metagenomes:
