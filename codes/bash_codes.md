@@ -30,13 +30,7 @@ samtools view -bS sample_x.sam > sample_x.bam
 samtools sort sample_x.bam -o sample_x.sorted.bam
 ```
 
-## 3. Coassemble reads from the multisample synthetic metagenome.
-```sh
-megahit -1 sample_0_01.fq.gz,sample_1_01.fq.gz,sample_2_01.fq.gz,sample_3_01.fq.gz \
--2 sample_0_02.fq.gz, sample_1_02.fq.gz, sample_2_02.fq.gz, sample_3_02.fq.gz -t 20 --out-dir \ megahit_coassembly_synethic --presets meta-large 
-```
-
-## 4. Benchmarking ChloroScan: 
+## 3. Benchmarking ChloroScan: 
 
 Run metabat2: 
 1. generate metabat2 depth profiles from bam files provided
@@ -102,20 +96,20 @@ chloroscan run --Inputs-assembly=$ASSEMBLY \
     --binning-bin-quality-min-completeness=70
 ```
 
-## 5. Run amber: 
+## 4. Run amber: 
 AMBER is a binning benchmarking tool to compare the performance between 2 or more metagenomic binners with golden standard mapping information.  
 ```sh
 amber.py -g gsa_mapping.tsv -l “binny,metabat2” binny_mapping.tsv metabat2_mapping.tsv -t 12  
 ```
 
-# 6. Run FragGeneScanRs on resulting bins. 
+# 5. Run FragGeneScanRs on resulting bins. 
 After getting new bins from the sample SAMEA2732360 and SAMEA2189670, we planned to blast their rbcL genes. So we firstly predicted their genes via FragGeneScanRs: 
 
 ```sh
 FragGeneScanRs -s bins.fa -t illumina_5 -p 4 -a bins_genes.faa -n bins_genes.fna
 ```
 
-# 7. Run orthofisher to annotate rbcL genes.
+# 6. Run orthofisher to annotate rbcL genes.
 This step has two file inputs:
  - bins.txt: a one/two column table storing paths to bins. 
  - hmms.txt: a one-column table storing path of rbcL.hmm.
