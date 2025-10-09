@@ -75,6 +75,33 @@ chloroscan run --Inputs-assembly=$ASSEMBLY \
     --binning-bin-quality-min-completeness=50
 ```
 
+For real metagenome runs, we altered the --binning-bin-quality-min-completeness from 50% to 70%. The command is:
+
+```sh
+ASSEMBLY=/path/to/contigs.fasta
+ALIGNMENT=/path/to/bam_dir
+BATCH_NAME="your_batch_name"
+OUTPUT=/path/to/output_dir
+BINNY_OUTPUTDIR=/path/to/binny_output_directory
+
+chloroscan run --Inputs-assembly=$ASSEMBLY \
+    --Inputs-alignment=$ALIGNMENT \
+    --Inputs-batch-name=$BATCH_NAME \
+    --outputdir=$OUTPUT \
+    --use-conda \
+    --conda-prefix="conda_env" \
+    --conda-frontend="mamba" \
+    --cores=12 \
+    --verbose \
+    --corgi-pthreshold=0.5 \
+    --binning-clustering-hdbscan-min-sample-range=1,5,10 \
+    --binning-bin-quality-purity=90 \
+    --binning-outputdir=$BINNY_OUTPUTDIR \
+    --corgi-min-length=1000 \
+    --force \
+    --binning-bin-quality-min-completeness=70
+```
+
 ## 5. Run amber: 
 AMBER is a binning benchmarking tool to compare the performance between 2 or more metagenomic binners with golden standard mapping information.  
 ```sh
