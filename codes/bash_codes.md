@@ -21,6 +21,8 @@ When running the main workflow, use the following command:
 nextflow run main.nf 
 ```
 
+Two synthetic metagenomes used in the study can be found at: https://doi.org/10.26188/28748540.
+
 ## 2. Mapping reads to assemblies for synthetic metagenomes and real metagenomes. 
 Turn sam to sorted.bam files.
 
